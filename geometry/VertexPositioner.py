@@ -8,11 +8,11 @@ class Hexagon():
     @staticmethod
     def _make_vertices(side_length, center_x, center_y):
         vertices = np.empty([6, 2])
-        for vertex_number in range(0.0, 5.0, 1.0):
+        for vertex_number in range(0, 5, 1):
             angle = (vertex_number * np.pi)/3
             x_position = side_length * np.sin(angle)
             y_position = side_length * np.cos(angle)
-            vertices[[vertex_number, ]] = [x_position + center_x,
+            vertices[vertex_number, :] = [x_position + center_x,
                                            y_position + center_y]
         return vertices
 
@@ -69,6 +69,19 @@ class VertexPositioner():
         x = radius * np.sin(theta)
         y = radius * np.cos(theta)
         return (x, y)
+
+    @staticmethod
+    def _position_uniq_vertices(hexagons):
+        """
+        Parameters
+        ==========
+        hexagons -- a list of Hexagons
+        Returns a list of unique (x, y, z) coordinates representing vertices of
+        our surface as 3-tuples.
+        """
+        hexagons.vertices
+
+
 
 
 
