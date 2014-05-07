@@ -17,13 +17,19 @@ class Geometry_tests():
         expected_2by2_hexagons = [Hexagon(1, x_center, y_center) for
                                   x_center,  y_center in it.product([-1, 1],
                                                                     [-1, 1])]
-        print "x: " + str([hex.__dict__ for hex in actual_2by2_hexagons])
+
         for actual_hexagon, expected_hexagon in zip(actual_2by2_hexagons,
                                  expected_2by2_hexagons):
             assert actual_hexagon == expected_hexagon
 
     def flat_hex_position_test(self):
         actual_1by1_hexs = VertexPositioner._flat_hex_pos(1, 1, 1)
+        print "1x1: " + str([hex.__dict__ for hex in actual_1by1_hexs])
         expected_1by1_hexs = [Hexagon(1, 0, 0)]
         actual_2by2_hexs = VertexPositioner._flat_hex_pos(1, 2, 2)
-        expected_2by2_hexs = [Hexagon(1,)]
+        print "2x2: " + str([hex.__dict__ for hex in actual_2by2_hexs])
+
+        expected_2by2_hexs = [Hexagon(1, -1, -1),
+                              Hexagon(1, 1, -1),
+                              Hexagon(1, -1, 1),
+                              Hexagon(1, 1, 1)]

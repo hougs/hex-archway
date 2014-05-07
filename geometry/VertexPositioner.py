@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 
 class Hexagon():
     def __init__(self, side_length, center_x, center_y):
@@ -8,7 +11,7 @@ class Hexagon():
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return all(self.__dict__ == other.__dict__)
+            return self.__dict__ == other.__dict__
         else:
             return False
 
@@ -16,11 +19,12 @@ class Hexagon():
     def _make_vertices(side_length, center_x, center_y):
         vertices = []
         for vertex_number in range(0, 5, 1):
-            angle = (vertex_number * np.pi)/3
+            angle = (vertex_number * np.pi) / 3
             x_position = side_length * np.sin(angle)
             y_position = side_length * np.cos(angle)
             vertices.append((x_position + center_x, y_position + center_y))
         return vertices
+
 
 class VertexPositioner():
     def __init__(self, approx_hex_side_length, n_hex_x_rows, n_hex_y_rows):
@@ -36,10 +40,10 @@ class VertexPositioner():
         rectangle, our hexagons would still tesselate it.
         """
         self.flat_hexagons = self._flat_hex_pos(approx_hex_side_length,
-                                            n_hex_x_rows,
-                                           n_hex_y_rows)
-        #self.arc_length = np.pi *
-        #self.vertex_positions = self._rect_to_cyl()
+                                                n_hex_x_rows,
+                                                n_hex_y_rows)
+        self.arch_vertex_positions = self._position_uniq_vertices(self.flat_hexagons)
+        self.arch_radius = n_hex_y_rows * approx_hex_side_length
 
     @staticmethod
     def _flat_hex_pos(hex_side_length, n_hex_x_row, n_hex_y_row):
@@ -59,8 +63,8 @@ class VertexPositioner():
             account for the desired number of hexagons in the arch.
         """
 
-        seed_pos_x = hex_side_length * (n_hex_x_row - 1)
-        seed_pos_y = hex_side_length * (n_hex_y_row - 1)
+        seed_pos_x = hex_side_length * (n_hex_x_row)
+        seed_pos_y = hex_side_length * (n_hex_y_row)
         hexagons = []
         for center_x in range(-seed_pos_x, seed_pos_x, 2 * hex_side_length):
             for center_y in range(-seed_pos_y, seed_pos_y,
@@ -68,26 +72,36 @@ class VertexPositioner():
                 hexagons.append(Hexagon(hex_side_length, center_x, center_y))
         return hexagons
 
-    def _rect_to_cyl_coords(self, radius, x, y):
+    def _rect_to_cyl_coords(self, xy_array):
         """
         (x, y) -> (x, R sin(th), R cos(th))
         where th = (pi * y)/(2 R)
         """
-        theta = (np.pi * y)/(radius * 2)
-        x = radius * np.sin(theta)
-        y = radius * np.cos(theta)
-        return (x, y)
+        x = xy_array[0]
+        y = xy_array[1]
+        theta = (np.pi * y) / (self.arch_radius * 2)
+        y = self.arch_radius * np.sin(theta)
+        z = self.arch_radius * np.cos(theta)
+        return (x, y, z)
 
-    @staticmethod
-    def _position_uniq_vertices(hexagons):
+    def _position_uniq_vertices(self, hexagons):
         """
         Parameters
         ==========
-        hexagons -- a list of Hexagons
+        hexagons -- a list of Hexagons.
         Returns a list of unique (x, y, z) coordinates representing vertices of
         our surface as 3-tuples.
         """
-        hexagons.vertices
+        coords_3d = []
+        for hexagon in hexagons:
+            coords_3d.append(np.apply_along_axis(self._rect_to_cyl_coords,
+                                                 axis=1, arr=hexagon
+                                                 .vertices))
+        return coords_3d
+
+    def plot_vertices(self):
+        fig = plt.figure()
+
 
 
 
