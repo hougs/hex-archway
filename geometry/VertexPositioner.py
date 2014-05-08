@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 class Hexagon():
@@ -17,12 +16,13 @@ class Hexagon():
 
     @staticmethod
     def _make_vertices(side_length, center_x, center_y):
-        vertices = []
-        for vertex_number in range(0, 5, 1):
+        vertices = np.empty(shape=[6, 2])
+
+        for vertex_number in range(0, 6, 1):
             angle = (vertex_number * np.pi) / 3
             x_position = side_length * np.sin(angle)
             y_position = side_length * np.cos(angle)
-            vertices.append((x_position + center_x, y_position + center_y))
+            vertices[vertex_number, :] = np.array([x_position, y_position])
         return vertices
 
 
@@ -39,11 +39,11 @@ class VertexPositioner():
         will add the constraint that if we formed a toroid out of our
         rectangle, our hexagons would still tesselate it.
         """
+        self.arch_radius = n_hex_y_rows * approx_hex_side_length
         self.flat_hexagons = self._flat_hex_pos(approx_hex_side_length,
                                                 n_hex_x_rows,
                                                 n_hex_y_rows)
-        self.arch_vertex_positions = self._position_uniq_vertices(self.flat_hexagons)
-        self.arch_radius = n_hex_y_rows * approx_hex_side_length
+        self.arch_vertex_positions = self._position_uniq_vertices()
 
     @staticmethod
     def _flat_hex_pos(hex_side_length, n_hex_x_row, n_hex_y_row):
@@ -84,7 +84,7 @@ class VertexPositioner():
         z = self.arch_radius * np.cos(theta)
         return (x, y, z)
 
-    def _position_uniq_vertices(self, hexagons):
+    def _position_uniq_vertices(self):
         """
         Parameters
         ==========
@@ -93,14 +93,24 @@ class VertexPositioner():
         our surface as 3-tuples.
         """
         coords_3d = []
-        for hexagon in hexagons:
+        for hexagon in self.flat_hexagons:
             coords_3d.append(np.apply_along_axis(self._rect_to_cyl_coords,
                                                  axis=1, arr=hexagon
                                                  .vertices))
         return coords_3d
 
     def plot_vertices(self):
-        fig = plt.figure()
+        plt.subplot(1, 1, 1)
+
+        x_pos = np.empty(shape=[len(self.flat_hexagons) * 6, 1])
+        y_pos = np.empty(shape=[len(self.flat_hexagons) * 6, 1])
+        for hex, idx in zip(self.flat_hexagons, range(0, len(self
+                .flat_hexagons), 1)):
+            x_pos[(idx * 6):((idx + 1) * 6), 0] = hex.vertices[:, 0]
+            y_pos[(idx * 6):((idx + 1) * 6), 0] = hex.vertices[:, 1]
+        plt.scatter(x_pos, y_pos)
+        plt.title("flat hexagons")
+        plt.show()
 
 
 

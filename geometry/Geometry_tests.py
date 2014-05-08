@@ -33,3 +33,7 @@ class Geometry_tests():
                               Hexagon(1, 1, -1),
                               Hexagon(1, -1, 1),
                               Hexagon(1, 1, 1)]
+
+    def flat_has_plot_test(self):
+        v_pos = VertexPositioner(1, 1, 1)
+        v_pos.plot_vertices()
