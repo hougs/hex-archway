@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class Hexagon():
@@ -17,12 +18,12 @@ class Hexagon():
     @staticmethod
     def _make_vertices(side_length, center_x, center_y):
         vertices = np.empty(shape=[6, 2])
-
         for vertex_number in range(0, 6, 1):
             angle = (vertex_number * np.pi) / 3
             x_position = side_length * np.sin(angle)
             y_position = side_length * np.cos(angle)
-            vertices[vertex_number, :] = np.array([x_position, y_position])
+            vertices[vertex_number, :] = np.array([x_position + center_x,
+                                                   y_position + center_y])
         return vertices
 
 
@@ -53,6 +54,10 @@ class VertexPositioner():
         and the rows of hexagons parallel to the y-axis will become ~semi
         circles.
 
+        *   *   *
+          *   *
+        *   *   *
+
 
         Parameters
         ==========
@@ -63,12 +68,14 @@ class VertexPositioner():
             account for the desired number of hexagons in the arch.
         """
 
-        seed_pos_x = hex_side_length * (n_hex_x_row)
+        x_row_displacement = 2 * hex_side_length * np.cos(np.pi / 6.0)
+        y_row_displacement = 3 * hex_side_length
         seed_pos_y = hex_side_length * (n_hex_y_row)
         hexagons = []
-        for center_x in range(-seed_pos_x, seed_pos_x, 2 * hex_side_length):
-            for center_y in range(-seed_pos_y, seed_pos_y,
-                                  2 * hex_side_length):
+        for x_hex_idx in range(0, n_hex_x_row, 1):
+            for y_hex_idx in range(0, n_hex_y_row, 1):
+                center_x = x_row_displacement * x_hex_idx
+                center_y = y_hex_idx * y_row_displacement
                 hexagons.append(Hexagon(hex_side_length, center_x, center_y))
         return hexagons
 
@@ -92,28 +99,26 @@ class VertexPositioner():
         Returns a list of unique (x, y, z) coordinates representing vertices of
         our surface as 3-tuples.
         """
-        coords_3d = []
-        for hexagon in self.flat_hexagons:
-            coords_3d.append(np.apply_along_axis(self._rect_to_cyl_coords,
-                                                 axis=1, arr=hexagon
-                                                 .vertices))
+        all_vertices = np.concatenate([hex.vertices for hex in self
+                                 .flat_hexagons], axis=0)
+        coords_3d = np.apply_along_axis(self._rect_to_cyl_coords,
+                                                 axis=1, arr=all_vertices)
         return coords_3d
 
     def plot_vertices(self):
-        plt.subplot(1, 1, 1)
-
-        x_pos = np.empty(shape=[len(self.flat_hexagons) * 6, 1])
-        y_pos = np.empty(shape=[len(self.flat_hexagons) * 6, 1])
-        for hex, idx in zip(self.flat_hexagons, range(0, len(self
-                .flat_hexagons), 1)):
-            x_pos[(idx * 6):((idx + 1) * 6), 0] = hex.vertices[:, 0]
-            y_pos[(idx * 6):((idx + 1) * 6), 0] = hex.vertices[:, 1]
-        plt.scatter(x_pos, y_pos)
+        plt.subplot(1, 2, 1)
+        all_vertices = np.concatenate([hex.vertices for hex in self
+                                 .flat_hexagons], axis=0)
+        print "size: " + str(all_vertices.shape)
+        #uniq_vertices = set(all_vertices)
+        fig = plt.figure()
+        ax = fig.add_subplot(121)
+        ax.scatter(all_vertices[:,0], all_vertices[:,1])
         plt.title("flat hexagons")
+        ax.axis('equal')
+        ax2 = fig.add_subplot(122, projection='3d')
+        ax2.scatter(self.arch_vertex_positions[:,0],
+                    self.arch_vertex_positions[:,1],
+                    self.arch_vertex_positions[:,2])
         plt.show()
-
-
-
-
-
 
