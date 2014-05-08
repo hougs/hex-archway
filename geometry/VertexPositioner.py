@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import scipy.spatial as scisp
+from sklearn.neighbors import NearestNeighbors
 
 
 class Hexagon():
@@ -106,19 +108,29 @@ class VertexPositioner():
         return coords_3d
 
     def plot_vertices(self):
-        plt.subplot(1, 2, 1)
         all_vertices = np.concatenate([hex.vertices for hex in self
                                  .flat_hexagons], axis=0)
         print "size: " + str(all_vertices.shape)
         #uniq_vertices = set(all_vertices)
         fig = plt.figure()
-        ax = fig.add_subplot(121)
+        ax = fig.add_subplot(131)
         ax.scatter(all_vertices[:,0], all_vertices[:,1])
         plt.title("flat hexagons")
         ax.axis('equal')
-        ax2 = fig.add_subplot(122, projection='3d')
+        ax2 = fig.add_subplot(132, projection='3d')
         ax2.scatter(self.arch_vertex_positions[:,0],
                     self.arch_vertex_positions[:,1],
                     self.arch_vertex_positions[:,2])
+        ax3 = fig.add_subplot(133, projection='3d')
+        neighbors = NearestNeighbors(n_neighbors=3, algorithm='ball_tree')\
+            .fit(self.arch_vertex_positions)
+        distances, neighbor_indices = neighbors.kneighbors(self
+                                                    .arch_vertex_positions)
+        for vertex_index, neighbor_indices in enumerate(neighbor_indices):
+            for neighbor_index in neighbor_indices:
+                line_seg_end_pts = self.arch_vertex_positions[np.array([
+                    vertex_index, neighbor_index])]
+                ax3.plot(line_seg_end_pts[:, 0], line_seg_end_pts[:, 1],
+                         line_seg_end_pts[:, 2])
         plt.show()
 
