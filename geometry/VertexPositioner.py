@@ -107,6 +107,20 @@ class VertexPositioner():
                 edge_list.append(Edge(np.array([first_end_pt, second_end_pt])))
         return edge_list
 
+    def _vertex_to_neighbor_dict(self):
+        vert_neighbor = {}
+        for x_hex_idx in range(0, self.n_hex_x_rows, 1):
+            for y_hex_idx in range(0, self.n_hex_y_rows, 1):
+                for vertex_idx in range(0, 6, 1):
+                    vert_neighbor.update({tuple(self.arch_vertex_positions[x_hex_idx, y_hex_idx, vertex_idx, :]): set()})
+        for edge in self.edges:
+            # members of our set must be hashable
+            node1 = tuple(edge.nodes[0, :])
+            node2 = tuple(edge.nodes[1, :])
+            vert_neighbor[node1] = vert_neighbor[node1].add(node2)
+            vert_neighbor[node2] = vert_neighbor[node2].add(node1)
+        return vert_neighbor
+
     def _rect_to_cyl_coords(self, x, y):
         """
         (x, y) -> (x, R sin(th), R cos(th))
