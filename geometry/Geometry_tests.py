@@ -1,5 +1,5 @@
-from VertexPositioner import Hexagon
-from VertexPositioner import VertexPositioner
+from GraphEmbedder import Hexagon
+from GraphEmbedder import GraphEmbedder
 import numpy.testing as nptst
 import itertools as it
 
@@ -13,6 +13,6 @@ class Geometry_tests():
 
 
     def flat_has_plot_test(self):
-        v_pos = VertexPositioner(1, 4, 7)
+        v_pos = GraphEmbedder(1, 4, 7)
         print v_pos._vertex_to_neighbor_dict()
         v_pos.plot_vertices()
