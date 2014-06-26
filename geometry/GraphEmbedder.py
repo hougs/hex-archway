@@ -192,3 +192,8 @@ class GraphEmbedder():
                 ax3.view_init(elev=float(elev), azim=float(ang))
                 plt.savefig("exp-{0}-{1}.png".format(ang, elev))
 
+def main():
+    v_pos = GraphEmbedder(1, 4, 7)
+    v_pos.plot_vertices()
+
+if __name__ == "__main__": main()
