@@ -41,14 +41,14 @@ class GraphEmbedder():
     def __init__(self, approx_hex_side_length, n_hex_x_rows, n_hex_y_rows):
         """
         Our strategy for positioning these hexagons in a cylindrical fashion is
-        to first tessealte a rectangle with the specified number of hexagons,
+        to first tesselate a rectangle with the specified number of hexagons,
         and then map that rectangle on to the surface of a cylinder in a
         distance preserving way. This is easily done by mapping points
             f(x, y) = (x, R sin(th), R cos(th))
             where th = (pi * y)/(2 * n_hex_y_rows * approx_side_length)
         In order to define the number of hexagons in a row as an integer, we
         will add the constraint that if we formed a toroid out of our
-        rectangle, our hexagons would still tesselate it.
+        rectangle, our hexagons would still tessellate it.
         """
         self.n_hex_x_rows = n_hex_x_rows
         self.n_hex_y_rows = n_hex_y_rows
@@ -56,6 +56,7 @@ class GraphEmbedder():
         self.flat_hexagons = self._flat_hex_pos(approx_hex_side_length)
         # a n_hex_x_rows by n_hex_y_rows by 6 by 3 np.array
         self.arch_vertex_positions = self._position_uniq_vertices()
+        # List of Edge objects
         self.edges = self._id_edges()
 
     def _flat_hex_pos(self, hex_side_length):
@@ -89,6 +90,9 @@ class GraphEmbedder():
         return hexagons
 
     def _id_edges(self):
+        """
+        Returns a List of L{Edge}s.
+        """
         edge_list = []
         # identify all edges along the hexagons we explicitly index
         for x_hex_idx in range(0, self.n_hex_x_rows, 1):
