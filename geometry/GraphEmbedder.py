@@ -113,26 +113,6 @@ class GraphEmbedder():
                 edge_list.append(Edge(np.array([first_end_pt, second_end_pt])))
         return edge_list
 
-    def _vertex_to_neighbor_dict(self):
-        vert_neighbor = []
-
-        for edge in self.edges:
-            # members of our set must be hashable
-            node1 = tuple(edge.nodes[0, :])
-            node2 = tuple(edge.nodes[1, :])
-            vert_neighbor.append([(node1, node2), (node2, node1)])
-
-        vert_neighbor_dict = {}
-        for center_edge, edges in groupby(vert_neighbor, itemgetter(0)):
-            vert_neighbor_dict[center_edge[0]] = set([])
-            for edge in edges:
-                assert edge[0][0] == center_edge[0]
-                print len(edge)
-                print edge[0]
-                print edge[1]
-                vert_neighbor_dict[edge[0][0]] = \
-                    vert_neighbor_dict[edge[0][0]].add(edge[0][1])
-        return vert_neighbor_dict
 
     def _rect_to_cyl_coords(self, x, y):
         """
@@ -190,11 +170,10 @@ class GraphEmbedder():
 
         for edge in self.edges:
             ax3.plot(edge.nodes[:, 0], edge.nodes[:, 1], edge.nodes[:, 2])
-        for elev in range(0, 12, 3):
-            for ang in xrange(20, 40, 10):
-                ax2.view_init(elev=float(elev), azim=float(ang))
-                ax3.view_init(elev=float(elev), azim=float(ang))
-                plt.savefig("exp-{0}-{1}.png".format(ang, elev))
+            for ang in xrange(40, 60, 10):
+                ax2.view_init(elev=float(6), azim=float(ang))
+                ax3.view_init(elev=float(6), azim=float(ang))
+                plt.savefig("exp-{0}-{1}.png".format(ang, 6))
 
 def main():
     v_pos = GraphEmbedder(1, 4, 7)
