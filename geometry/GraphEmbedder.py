@@ -31,10 +31,18 @@ class Hexagon():
 class Edge():
     def __init__(self, nodes):
         assert len(nodes) == 2
+        # I think this is the precise way to check for a list.
+        assert isinstance(nodes, list)
+        assert not isinstance(nodes, basestring)
         self.nodes = nodes
 
-    def get_vector(self):
-        return self.nodes[0] - self.nodes[1]
+    def origins_and_displacements(self):
+        """Returns two tuples, one for each origin and displacement vector"""
+        origin0 = self.nodes[0]
+        disp0 = self.nodes[1] - self.nodes[0]
+        origin1 = self.nodes[1]
+        disp1 = self.nodes[0] - self.nodes[0]
+        return origin0, disp0, origin1, disp1
 
 
 class GraphEmbedder():
